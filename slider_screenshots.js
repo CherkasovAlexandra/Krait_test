@@ -1,23 +1,23 @@
 'use strict';
-var multiItemSlider = (function () {
+var multiItemSliderScreenshots = (function () {
     return function (selector, config) {
         var
             _mainElement = document.querySelector(selector), // основный элемент блока
-            _sectionSliderPeople = _mainElement.querySelector('section.slider_people .vertical_wrapper_page'), // обертка для .slider-item
-            _sliderWrapper = _mainElement.querySelector('section.slider_people .slider__wrapper'), // обертка для .slider-item
-            _sliderItems = _mainElement.querySelectorAll('section.slider_people .slider__item'), // элементы (.slider-item)
-            _sliderControls = _mainElement.querySelectorAll('section.slider_people .slider__control'), // элементы управления
-            _sliderControlLeft = _mainElement.querySelector('section.slider_people .slider__control_left'), // кнопка "LEFT"
-            _sliderControlRight = _mainElement.querySelector('section.slider_people .slider__control_right'), // кнопка "RIGHT"
+            _sectionScreenshots = _mainElement.querySelector('.screenshots .vertical_wrapper_page'),
+            _sliderWrapper = _mainElement.querySelector('section.screenshots .slider__wrapper'), // обертка для .slider-item
+            _sliderItems = _mainElement.querySelectorAll('section.screenshots .slider__item'), // элементы (.slider-item)
+            _sliderControls = _mainElement.querySelectorAll('section.screenshots .slider__control'), // элементы управления
+            _sliderControlLeft = _mainElement.querySelector('section.screenshots .slider__control_left'), // кнопка "LEFT"
+            _sliderControlRight = _mainElement.querySelector('section.screenshots .slider__control_right'), // кнопка "RIGHT"
+            _sectionScreenshotsWidth = parseFloat(getComputedStyle(_sectionScreenshots).width), // ширина экрана
             _wrapperWidth = parseFloat(getComputedStyle(_sliderWrapper).width), // ширина обёртки
             _itemWidth = parseFloat(getComputedStyle(_sliderItems[0]).width), // ширина одного элемента
-            _sectionSliderPeopleWidth = parseFloat(getComputedStyle(_sectionSliderPeople).width), // ширина экрана
             _positionLeftItem = 0, // позиция левого активного элемента
-            _indexActiveItem = 1, // индекс активного элемента
+            _indexActiveItem = 0, // индекс активного элемента
             _transform = 0, // значение транфсофрмации .slider_wrapper
             _step = _itemWidth / _wrapperWidth * 100, // величина шага (для трансформации)
             _items = [], // массив элементов
-            _startX = 0,
+             _startX = 0,
             _interval = 0,
             _config = {
                 isCycling: false, // автоматическая смена слайдов
@@ -31,14 +31,26 @@ var multiItemSlider = (function () {
                 _config[key] = config[key];
             }
         }
-
-        _sliderItems[_indexActiveItem].classList.add("active");
         // наполнение массива _items
         _sliderItems.forEach(function (item, index) {
             _items.push({ item: item, position: index, transform: 0 });
         });
+        if(_sectionScreenshotsWidth < 881) {
+            _sliderItems[_indexActiveItem].classList.add("first_left_slide");
+            _sliderItems[_indexActiveItem + 1].classList.add("second_slide");
+            _sliderItems[_indexActiveItem + 2].classList.add("third_slide");
+        } else {
+            _sliderItems[_indexActiveItem].classList.add("first_left_slide");
+            _sliderItems[_indexActiveItem + 1].classList.add("second_slide");
+            _sliderItems[_indexActiveItem + 2].classList.add("third_slide");
+            _sliderItems[_indexActiveItem + 3].classList.add("main_slide");
+            _sliderItems[_indexActiveItem + 4].classList.add("third_slide");
+            _sliderItems[_indexActiveItem + 5].classList.add("second_slide");
+            _sliderItems[_indexActiveItem + 6].classList.add("first_right_slide");
+        }
         var length = _items.length;
         console.log(length);
+        console.log(_sectionScreenshotsWidth);
         var position = {
             getItemMin: function () {
                 var indexItem = 0;
@@ -69,7 +81,9 @@ var multiItemSlider = (function () {
 
         var _transformItem = function (direction) {
             var nextItem;
-            _sliderItems[_indexActiveItem%length].classList.remove("active");
+            for( var i = 0; i< length; i++){
+                _sliderItems[i].classList.remove("first_right_slide", "second_slide", "third_slide", "main_slide", "first_left_slide");
+            }
             if (direction === 'right') {
                 _positionLeftItem++;
                 _indexActiveItem++;
@@ -95,7 +109,19 @@ var multiItemSlider = (function () {
                 _transform += _step;
             }
             _sliderWrapper.style.transform = 'translateX(' + _transform + '%)';
-            _sliderItems[_indexActiveItem].classList.add("active");
+            if(_sectionScreenshotsWidth < 881) {
+                _sliderItems[_indexActiveItem%length].classList.add("first_left_slide");
+                _sliderItems[(_indexActiveItem + 1)%length].classList.add("second_slide");
+                _sliderItems[(_indexActiveItem + 2)%length].classList.add("third_slide");
+            } else{
+            _sliderItems[_indexActiveItem%length].classList.add("first_left_slide");
+            _sliderItems[(_indexActiveItem + 1)%length].classList.add("second_slide");
+            _sliderItems[(_indexActiveItem + 2)%length].classList.add("third_slide");
+            _sliderItems[(_indexActiveItem + 3)%length].classList.add("main_slide");
+            _sliderItems[(_indexActiveItem + 4)%length].classList.add("third_slide");
+            _sliderItems[(_indexActiveItem + 5)%length].classList.add("second_slide");
+            _sliderItems[(_indexActiveItem + 6)%length].classList.add("first_right_slide");
+            }
         }
 
         var _cycle = function (direction) {
@@ -132,20 +158,20 @@ var multiItemSlider = (function () {
                     _cycle(_config.direction);
                 });
             }
-            if(_sectionSliderPeopleWidth < 501){
-                _mainElement.addEventListener('touchstart', function (e) {
-                    _startX = e.changedTouches[0].clientX;
-                });
-                _mainElement.addEventListener('touchend', function (e) {
-                    var
-                        _endX = e.changedTouches[0].clientX,
-                        _deltaX = _endX - _startX;
-                    if (_deltaX > 50) {
-                        _transformItem('left');
-                    } else if (_deltaX < -50) {
-                        _transformItem('right');
-                    }
-                });
+            if(_sectionScreenshotsWidth < 501){
+            _mainElement.addEventListener('touchstart', function (e) {
+               _startX = e.changedTouches[0].clientX;
+            });
+            _mainElement.addEventListener('touchend', function (e) {
+                var
+                    _endX = e.changedTouches[0].clientX,
+                    _deltaX = _endX - _startX;
+                if (_deltaX > 50) {
+                    _transformItem('left');
+                } else if (_deltaX < -50) {
+                    _transformItem('right');
+                }
+            });
             }
         }
 
@@ -174,7 +200,7 @@ var multiItemSlider = (function () {
     }
 }());
 
-var slider = multiItemSlider('section.slider_people', {
+var slider = multiItemSliderScreenshots('section.screenshots', {
     isCycling: true
 });
 
